@@ -18,7 +18,19 @@ class LoginController extends Controller
     |
     */
 
-    use AuthenticatesUsers;
+    use AuthenticatesUsers {
+        attemptLogin as protected traitAttemptLogin;
+    }
+
+    protected function attemptLogin($request)
+    {
+        $credentials = $this->credentials($request);
+        $credentials['is_approved'] = 1;
+        return $this->guard()->attempt(
+            $credentials,
+            $request->filled('remember')
+        );
+    }
 
     /**
      * Where to redirect users after login.

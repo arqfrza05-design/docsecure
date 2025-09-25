@@ -21,6 +21,18 @@ class DocumentController extends Controller
         return view('documents.index', compact('documents'));
     }
 
+    // Admin: lihat semua dokumen dari semua user
+    public function adminIndex()
+    {
+        // Ambil dokumen beserta user, lalu kelompokkan berdasarkan user
+        $documentsByUser = Document::with('user')->get()->groupBy(function($doc) {
+            return $doc->user ? $doc->user->name : 'Tanpa User';
+        });
+        return view('admin.documents', [
+            'documentsByUser' => $documentsByUser
+        ]);
+    }
+
     // Show upload form
     public function create()
     {
@@ -41,12 +53,18 @@ class DocumentController extends Controller
         $content = file_get_contents($file->getRealPath());
         $encryptedContent = openssl_encrypt($content, 'AES-256-CBC', $key, 0, substr(hash('sha256', $key), 0, 16));
         Storage::put('private/'.$filename, $encryptedContent);
+
+        // Enkripsi recovery_key dengan master key dari .env
+        $masterKey = env('APP_KEY');
+        $recoveryKey = openssl_encrypt($key, 'AES-256-CBC', $masterKey, 0, substr(hash('sha256', $masterKey), 0, 16));
+
         Document::create([
             'user_id' => Auth::id(),
             'filename' => $filename,
             'original_name' => $originalName,
             'encrypted' => true,
             'encryption_key_hash' => bcrypt($key),
+            'recovery_key' => $recoveryKey,
         ]);
         return redirect()->route('documents.index')->with('success', 'File uploaded & encrypted!');
     }

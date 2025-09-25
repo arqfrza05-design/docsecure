@@ -12,6 +12,16 @@
         <input type="password" name="key" required>
         <button type="submit">Download</button>
     </form>
+    @if(Auth::user() && Auth::user()->role === 'admin' && $doc->recovery_key)
+        <div class="alert alert-info mt-3">
+            <b>Kunci Rahasia (Recovery, hanya admin):</b><br>
+            @php
+                $masterKey = env('APP_KEY');
+                $decryptedKey = openssl_decrypt($doc->recovery_key, 'AES-256-CBC', $masterKey, 0, substr(hash('sha256', $masterKey), 0, 16));
+            @endphp
+            <code>{{ $decryptedKey }}</code>
+        </div>
+    @endif
     @if($doc->encrypted)
         <form method="GET" action="{{ route('documents.downloadEncrypted', $doc->id) }}" style="margin-top:20px;">
             <button type="submit" class="btn btn-warning">Download File Terenkripsi (Utuh)</button>

@@ -16,6 +16,7 @@ class Document extends Model
         'encrypted',
         'encryption_key_hash',
         'description',
+        'recovery_key',
     ];
 
     public function user()

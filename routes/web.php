@@ -1,15 +1,32 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+// use Illuminate\Support\Facades\Route; // Sudah di-import sebelumnya
 
 
 use App\Http\Controllers\DocumentController;
+// use Illuminate\Support\Facades\Auth; // Sudah di-import sebelumnya
+
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+
+// Route khusus admin
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/documents', [\App\Http\Controllers\DocumentController::class, 'adminIndex'])->name('admin.documents.index');
+    Route::get('/dashboard', function () {
+        return view('admin.dashboard');
+    })->name('admin.dashboard');
+
+    // Contoh fitur tambahan: manajemen user (hanya admin)
+    Route::get('/users', [\App\Http\Controllers\UserController::class, 'index'])->name('admin.users.index');
+    Route::post('/users/{id}/approve', [\App\Http\Controllers\UserController::class, 'approve'])->name('admin.users.approve');
+    Route::delete('/users/{id}', [\App\Http\Controllers\UserController::class, 'destroy'])->name('admin.users.destroy');
+});
 
 Route::get('/', function () {
     return redirect()->route('documents.index');
 });
 
+// Aktifkan kembali register
 Auth::routes();
 
 Route::middleware('auth')->group(function () {

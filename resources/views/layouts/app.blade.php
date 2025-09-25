@@ -14,9 +14,14 @@
                 <ul class="navbar-nav ms-auto">
                     @guest
                         <li class="nav-item"><a class="nav-link" href="{{ route('login') }}">Login</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ route('register') }}">Register</a></li>
                     @else
-                        <li class="nav-item"><a class="nav-link" href="{{ route('documents.index') }}">Dokumen</a></li>
+                        @if(Auth::user() && Auth::user()->role === 'admin')
+                            <li class="nav-item"><a class="nav-link" href="{{ route('admin.documents.index') }}">Dokumen</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('admin.dashboard') }}">Admin Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('admin.users.index') }}">Manajemen User</a></li>
+                        @else
+                            <li class="nav-item"><a class="nav-link" href="{{ route('documents.index') }}">Dokumen</a></li>
+                        @endif
                         <li class="nav-item">
                             <form action="{{ route('logout') }}" method="POST" style="display:inline">
                                 @csrf

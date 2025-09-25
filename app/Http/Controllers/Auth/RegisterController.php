@@ -63,10 +63,22 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+        // User baru harus di-approve admin
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'role' => 'user',
+            'is_approved' => false,
         ]);
+    }
+
+    /**
+     * Override registered to redirect to login after registration.
+     */
+    protected function registered($request, $user)
+    {
+        $this->guard()->logout();
+        return redirect()->route('login')->with('success', 'Registrasi berhasil! Silakan login.');
     }
 }
