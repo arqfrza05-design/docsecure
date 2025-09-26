@@ -18,23 +18,23 @@
     </style>
     @foreach($documentsByUser as $userName => $docs)
         <h4 class="mt-4">Staff: {{ $userName }}</h4>
-        <table class="table table-bordered align-middle admin-doc-table">
-            <thead>
+        <table class="table table-bordered align-middle">
+            <thead class="table-primary">
                 <tr>
-                    <th class="id-col">ID</th>
-                    <th class="name-col">Nama File</th>
-                    <th class="status-col">Status</th>
-                    <th class="action-col">Aksi</th>
+                    <th style="width:5%">ID</th>
+                    <th style="width:55%">Nama File</th>
+                    <th style="width:20%">Status</th>
+                    <th style="width:20%">Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($docs as $doc)
                 <tr>
-                    <td class="id-col">{{ $doc->id }}</td>
-                    <td class="name-col">{{ $doc->original_name }}</td>
-                    <td class="status-col">{{ $doc->encrypted ? 'Terenkripsi' : 'Biasa' }}</td>
-                    <td class="action-col">
-                        <a href="{{ route('documents.show', $doc->id) }}">Lihat</a>
+                    <td>{{ $doc->id }}</td>
+                    <td>{{ $doc->original_name }}</td>
+                    <td>{{ $doc->encrypted ? 'Terenkripsi' : 'Biasa' }}</td>
+                    <td>
+                        <a href="{{ route('documents.show', $doc->id) }}" class="btn btn-sm btn-info border-primary text-white">Lihat</a>
                     </td>
                 </tr>
                 @endforeach

@@ -17,7 +17,13 @@ class DocumentController extends Controller
         if ($request->has('search')) {
             $query->where('original_name', 'like', '%'.$request->search.'%');
         }
-        $documents = $query->where('user_id', Auth::id())->get();
+        // Jika admin, tampilkan semua dokumen. Jika staff/user, tampilkan hanya dokumen miliknya sendiri
+        $user = Auth::user();
+        if ($user && $user->role === 'admin') {
+            $documents = $query->with('user')->get();
+        } else {
+            $documents = $query->with('user')->where('user_id', $user->id)->get();
+        }
         return view('documents.index', compact('documents'));
     }
 

@@ -8,8 +8,15 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
-        <div class="container">
-            <a class="navbar-brand" href="/">DocSecure</a>
+        <div class="container d-flex align-items-center">
+            <a class="navbar-brand me-3" href="{{ Auth::check() ? (Auth::user()->role === 'admin' ? route('home') : route('home')) : '/' }}">DocSecure</a>
+            @php
+                $hideBack = false;
+                if (request()->routeIs('login')) $hideBack = true;
+            @endphp
+            @if(!$hideBack)
+            <button class="btn btn-outline-secondary me-auto" onclick="window.history.back()">&larr; Kembali</button>
+            @endif
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav ms-auto">
                     @guest
@@ -17,10 +24,13 @@
                     @else
                         @if(Auth::user() && Auth::user()->role === 'admin')
                             <li class="nav-item"><a class="nav-link" href="{{ route('admin.documents.index') }}">Dokumen</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{{ route('admin.dashboard') }}">Admin Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('admin.dashboard') }}">Manajemen Kunci</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ route('admin.users.index') }}">Manajemen User</a></li>
                         @else
                             <li class="nav-item"><a class="nav-link" href="{{ route('documents.index') }}">Dokumen</a></li>
+                        @endif
+                        @if(Auth::user() && Auth::user()->role !== 'admin')
+                        <li class="nav-item"><a class="nav-link" href="{{ route('profile.edit') }}">Profil</a></li>
                         @endif
                         <li class="nav-item">
                             <form action="{{ route('logout') }}" method="POST" style="display:inline">

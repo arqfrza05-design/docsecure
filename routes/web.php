@@ -1,4 +1,9 @@
 <?php
+// Route profil user
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+});
 
 // use Illuminate\Support\Facades\Route; // Sudah di-import sebelumnya
 
@@ -12,9 +17,7 @@ use Illuminate\Support\Facades\Route;
 // Route khusus admin
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/documents', [\App\Http\Controllers\DocumentController::class, 'adminIndex'])->name('admin.documents.index');
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
+    Route::get('/dashboard', [\App\Http\Controllers\KeyManagementController::class, 'index'])->name('admin.dashboard');
 
     // Contoh fitur tambahan: manajemen user (hanya admin)
     Route::get('/users', [\App\Http\Controllers\UserController::class, 'index'])->name('admin.users.index');
