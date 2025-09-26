@@ -48,11 +48,12 @@ Jika menggunakan Laragon, biasanya juga bisa klik [http://localhost:8000](http:/
 
 ## Akun Default
 - Admin: 
-	- email: admin@example.com
-	- password: password
+	- email: admintetap@gmail.com
+	- password: admin123
 - User/Staff: 
-	- email: user@example.com
-	- password: password
+	- email: staff2@gmail.com
+    - email: staff1@gmail.com 
+	- password: staff123
 
 ## Catatan
 - Tidak wajib menggunakan VS Code, bisa pakai terminal/cmd biasa.
