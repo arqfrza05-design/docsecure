@@ -5,7 +5,7 @@
     <form method="GET" action="{{ route('documents.encrypted') }}" class="mb-3">
         <input type="text" name="search" placeholder="Cari dokumen..." value="{{ request('search') }}">
         <button type="submit">Cari</button>
-        <a href="{{ route('documents.index') }}">Kembali ke Semua Dokumen</a>
+    {{-- Tombol kembali dihapus sesuai permintaan --}}
     </form>
     <table border="1" cellpadding="8">
         <tr>

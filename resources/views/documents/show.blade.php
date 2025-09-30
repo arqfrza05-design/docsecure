@@ -6,12 +6,19 @@
     <p><b>Status:</b> {{ $doc->encrypted ? 'Terenkripsi' : 'Belum' }}</p>
     <p><b>Di-upload pada:</b> {{ $doc->created_at->format('d-m-Y H:i') }}</p>
     <p><b>Terakhir diubah:</b> {{ $doc->updated_at->format('d-m-Y H:i') }}</p>
-    <form method="POST" action="{{ route('documents.download', $doc->id) }}">
-        @csrf
-        <label>Masukkan Kunci Rahasia untuk Download & Dekripsi:</label>
-        <input type="password" name="key" required>
-        <button type="submit">Download</button>
-    </form>
+    @if(!$doc->encrypted)
+        <form method="POST" action="{{ route('documents.download', $doc->id) }}">
+            @csrf
+            <button type="submit">Download</button>
+        </form>
+    @else
+        <form method="POST" action="{{ route('documents.download', $doc->id) }}">
+            @csrf
+            <label>Masukkan Kunci Rahasia untuk Download & Dekripsi:</label>
+            <input type="password" name="key" required>
+            <button type="submit">Download</button>
+        </form>
+    @endif
     @if(Auth::user() && Auth::user()->role === 'admin' && $doc->recovery_key)
         <div class="alert alert-info mt-3">
             <b>Kunci Rahasia (Recovery, hanya admin):</b><br>
