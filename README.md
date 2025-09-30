@@ -53,8 +53,9 @@ Lalu akses di browser: [http://127.0.0.1:8000](http://127.0.0.1:8000)
   - email: admintetap@gmail.com
   - password: admin123
 - User/Staff: 
-  - email: staff2@gmail.com
-  - email: staff1@gmail.com 
+  - email: stafflayanan@gmail.com
+  - email: staffpsdm@gmail.com
+  - email: staffvip@gmail.com 
   - password: staff123
 
 ## Troubleshooting
