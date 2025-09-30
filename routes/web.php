@@ -26,7 +26,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 });
 
 Route::get('/', function () {
-    return redirect()->route('documents.index');
+    return redirect()->route('home');
 });
 
 // Aktifkan kembali register
