@@ -25,7 +25,7 @@
         @foreach($documents as $doc)
             <tr>
                 <td>{{ $doc->original_name }}</td>
-                <td>{{ $doc->status_label ?? ($doc->encrypted ? 'Rahasia' : 'Umum') }}</td>
+                <td>{{ $doc->encrypted ? 'Terenkripsi' : 'Belum' }}</td>
                 <td>
                     <a href="{{ route('documents.show', $doc->id) }}" class="btn btn-sm btn-info border-primary text-white">Lihat</a>
                     <a href="{{ route('documents.edit', $doc->id) }}" class="btn btn-sm btn-warning">Edit</a>

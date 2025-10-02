@@ -17,15 +17,12 @@ class DocumentController extends Controller
         if ($request->has('search')) {
             $query->where('original_name', 'like', '%'.$request->search.'%');
         }
+        // Jika admin, tampilkan semua dokumen. Jika staff/user, tampilkan hanya dokumen miliknya sendiri
         $user = Auth::user();
         if ($user && $user->role === 'admin') {
             $documents = $query->with('user')->get();
         } else {
             $documents = $query->with('user')->where('user_id', $user->id)->get();
-        }
-        // Tambahkan status: 'Rahasia' jika terenkripsi, 'Umum' jika tidak
-        foreach ($documents as $doc) {
-            $doc->status_label = $doc->encrypted ? 'Rahasia' : 'Umum';
         }
         return view('documents.index', compact('documents'));
     }
@@ -53,40 +50,29 @@ class DocumentController extends Controller
     {
         $request->validate([
             'file' => 'required|file',
-            'encrypt' => 'required',
+            'key' => 'required|string|min:6',
         ]);
         $file = $request->file('file');
+        $key = $request->input('key');
         $originalName = $file->getClientOriginalName();
         $filename = Str::random(40);
         $content = file_get_contents($file->getRealPath());
-        $isEncrypted = $request->input('encrypt') == '1';
-        if ($isEncrypted) {
-            $request->validate(['key' => 'required|string|min:6']);
-            $key = $request->input('key');
-            $encryptedContent = openssl_encrypt($content, 'AES-256-CBC', $key, 0, substr(hash('sha256', $key), 0, 16));
-            Storage::put('private/'.$filename, $encryptedContent);
-            $masterKey = env('APP_KEY');
-            $recoveryKey = openssl_encrypt($key, 'AES-256-CBC', $masterKey, 0, substr(hash('sha256', $masterKey), 0, 16));
-            Document::create([
-                'user_id' => Auth::id(),
-                'filename' => $filename,
-                'original_name' => $originalName,
-                'encrypted' => true,
-                'encryption_key_hash' => bcrypt($key),
-                'recovery_key' => $recoveryKey,
-            ]);
-        } else {
-            Storage::put('private/'.$filename, $content);
-            Document::create([
-                'user_id' => Auth::id(),
-                'filename' => $filename,
-                'original_name' => $originalName,
-                'encrypted' => false,
-                'encryption_key_hash' => null,
-                'recovery_key' => null,
-            ]);
-        }
-        return redirect()->route('documents.index')->with('success', 'File uploaded!');
+        $encryptedContent = openssl_encrypt($content, 'AES-256-CBC', $key, 0, substr(hash('sha256', $key), 0, 16));
+        Storage::put('private/'.$filename, $encryptedContent);
+
+        // Enkripsi recovery_key dengan master key dari .env
+        $masterKey = env('APP_KEY');
+        $recoveryKey = openssl_encrypt($key, 'AES-256-CBC', $masterKey, 0, substr(hash('sha256', $masterKey), 0, 16));
+
+        Document::create([
+            'user_id' => Auth::id(),
+            'filename' => $filename,
+            'original_name' => $originalName,
+            'encrypted' => true,
+            'encryption_key_hash' => bcrypt($key),
+            'recovery_key' => $recoveryKey,
+        ]);
+        return redirect()->route('documents.index')->with('success', 'File uploaded & encrypted!');
     }
 
     // Show file list (unencrypted & encrypted)
@@ -100,12 +86,6 @@ class DocumentController extends Controller
     public function download(Request $request, $id)
     {
         $doc = Document::findOrFail($id);
-        if (!$doc->encrypted) {
-            $content = Storage::get('private/'.$doc->filename);
-            return response($content)
-                ->header('Content-Type', 'application/octet-stream')
-                ->header('Content-Disposition', 'attachment; filename="'.$doc->original_name.'"');
-        }
         $request->validate(['key' => 'required|string']);
         if (!password_verify($request->key, $doc->encryption_key_hash)) {
             return back()->withErrors(['key' => 'Kunci salah!']);
